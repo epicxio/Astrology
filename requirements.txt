@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+swisseph
+matplotlib
+numpy
+pytz
+python-multipart 

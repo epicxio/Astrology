@@ -1,0 +1,147 @@
+# Epic-X Horoscope Project Structure
+
+```
+Epic-X_Horoscope/
+│
+├── backend/                    # Python Backend
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── api/               # API endpoints
+│   │   │   ├── __init__.py
+│   │   │   ├── horoscope.py   # Horoscope calculation endpoints
+│   │   │   ├── matchmaking.py # Match making endpoints
+│   │   │   ├── reports.py     # Report generation endpoints
+│   │   │   └── places.py      # Places data endpoints
+│   │   │
+│   │   ├── services/          # Business logic
+│   │   │   ├── __init__.py
+│   │   │   ├── horoscope_calc.py
+│   │   │   ├── match_calc.py
+│   │   │   └── pdf_generator.py
+│   │   │
+│   │   ├── models/            # Database models
+│   │   │   ├── __init__.py
+│   │   │   ├── user.py
+│   │   │   ├── horoscope.py
+│   │   │   ├── matchmaking.py
+│   │   │   └── places.py
+│   │   │
+│   │   ├── utils/             # Utility functions
+│   │   │   ├── __init__.py
+│   │   │   ├── rashi_calc.py
+│   │   │   ├── nakshatra_calc.py
+│   │   │   └── timezone_utils.py
+│   │   │
+│   │   └── i18n/              # Translations
+│   │       ├── en/
+│   │       ├── ml/
+│   │       └── ta/
+│   │
+│   ├── config/                # Configuration files
+│   │   ├── __init__.py
+│   │   ├── settings.py
+│   │   └── database.py
+│   │
+│   ├── tests/                 # Backend tests
+│   │   ├── __init__.py
+│   │   ├── test_horoscope.py
+│   │   ├── test_matchmaking.py
+│   │   └── test_reports.py
+│   │
+│   ├── requirements.txt       # Python dependencies
+│   └── main.py               # Application entry point
+│
+├── frontend/                  # React Frontend
+│   ├── public/
+│   │   ├── index.html
+│   │   └── assets/
+│   │
+│   ├── src/
+│   │   ├── components/       # Reusable UI components
+│   │   │   ├── forms/
+│   │   │   │   ├── HoroscopeForm.jsx
+│   │   │   │   └── MatchMakingForm.jsx
+│   │   │   │
+│   │   │   ├── ui/
+│   │   │   │   ├── DatePicker.jsx
+│   │   │   │   ├── TimePicker.jsx
+│   │   │   │   ├── PlaceDropdown.jsx
+│   │   │   │   └── LanguageSelector.jsx
+│   │   │   │
+│   │   │   └── results/
+│   │   │       ├── HoroscopeResult.jsx
+│   │   │       └── MatchResult.jsx
+│   │   │
+│   │   ├── pages/           # Page components
+│   │   │   ├── Home.jsx
+│   │   │   ├── Horoscope.jsx
+│   │   │   └── MatchMaking.jsx
+│   │   │
+│   │   ├── services/        # API services
+│   │   │   ├── api.js
+│   │   │   ├── horoscope.js
+│   │   │   └── matchmaking.js
+│   │   │
+│   │   ├── i18n/           # Frontend translations
+│   │   │   ├── en/
+│   │   │   ├── ml/
+│   │   │   └── ta/
+│   │   │
+│   │   ├── utils/          # Utility functions
+│   │   │   ├── validation.js
+│   │   │   └── formatters.js
+│   │   │
+│   │   ├── App.jsx
+│   │   ├── index.js
+│   │   └── styles/
+│   │
+│   ├── package.json
+│   └── README.md
+│
+├── database/                 # Database related files
+│   ├── migrations/          # Database migrations
+│   ├── seeds/              # Initial data
+│   │   ├── places.sql
+│   │   └── translations.sql
+│   └── schema.sql          # Database schema
+│
+├── docs/                    # Documentation
+│   ├── api.md
+│   ├── setup.md
+│   └── user_guide.md
+│
+├── .gitignore
+├── README.md
+└── docker-compose.yml      # Docker configuration
+```
+
+## Key Directories and Files
+
+### Backend (`/backend`)
+- **app/**: Main application code
+  - **api/**: REST API endpoints
+  - **services/**: Business logic
+  - **models/**: Database models
+  - **utils/**: Utility functions
+  - **i18n/**: Translation files
+- **config/**: Configuration files
+- **tests/**: Test files
+
+### Frontend (`/frontend`)
+- **src/components/**: Reusable UI components
+  - **forms/**: Form components
+  - **ui/**: UI elements
+  - **results/**: Result display components
+- **src/pages/**: Page components
+- **src/services/**: API service functions
+- **src/i18n/**: Translation files
+
+### Database (`/database`)
+- **migrations/**: Database migration files
+- **seeds/**: Initial data
+- **schema.sql**: Database schema
+
+### Documentation (`/docs`)
+- API documentation
+- Setup guide
+- User guide 

@@ -1,0 +1,107 @@
+# Epic-X Horoscope Project Requirements
+
+## Project Overview
+A web-based horoscope and matchmaking system with multilingual PDF report generation.
+
+## Tech Stack
+- Frontend: React
+- Backend: Python
+- Database: MySQL
+- PDF Generation: ReportLab/WeasyPrint
+- Multilingual Support: i18n
+
+## Core Modules
+
+### 1. Horoscope Calculation Module
+Input Requirements:
+- Date of Birth (Calendar Picker UI)
+- Time of Birth (Time Picker UI)
+- Place of Birth (Dropdown with Indian Cities/Towns/Villages)
+- Country of Birth (Dropdown, default: India)
+
+Output:
+- Calculated Rashi (Moon Sign)
+- Calculated Nakshatra (Star)
+- Detailed horoscope predictions
+- PDF report in English, Malayalam, and Tamil
+
+### 2. Match Making Module
+Input Requirements (for both individuals):
+- Name (Text Input)
+- Gender (Radio Buttons: Male/Female)
+- Date of Birth (Calendar Picker UI)
+- Time of Birth (Time Picker UI)
+- Place of Birth (Dropdown with Indian Cities/Towns/Villages)
+- Country of Birth (Dropdown, default: India)
+
+Output:
+- Compatibility score
+- Detailed match analysis
+- PDF report in English, Malayalam, and Tamil
+
+### 3. Report Generation Module
+Features:
+- Generate PDF reports for both horoscope and matchmaking
+- Support for three languages:
+  - English
+  - Malayalam
+  - Tamil
+- Professional formatting and layout
+- Include all calculated details and predictions
+
+## Technical Requirements
+
+### Database Schema
+Tables needed:
+1. Users (optional, for authentication)
+2. HoroscopeCalculations
+3. MatchMakingResults
+4. LanguageTranslations
+5. Places (for dropdown data)
+
+### API Endpoints
+1. Horoscope Calculation
+   - POST /api/horoscope
+   - GET /api/horoscope/{id}
+
+2. Match Making
+   - POST /api/matchmaking
+   - GET /api/matchmaking/{id}
+
+3. Reports
+   - GET /api/reports/horoscope/{id}/{language}
+   - GET /api/reports/matchmaking/{id}/{language}
+
+4. Places
+   - GET /api/places (for dropdown data)
+
+### Frontend Requirements
+1. User-friendly UI components:
+   - Calendar Picker for Date of Birth
+   - Time Picker for Time of Birth
+   - Dropdown for Place of Birth (with search functionality)
+   - Dropdown for Country of Birth
+   - Radio Buttons for Gender selection
+   - Text Input only for Name
+2. Responsive design
+3. Language selection
+4. PDF download functionality
+5. Results display
+6. Form validation
+7. Auto-complete for place names
+
+### Backend Requirements
+1. Accurate Rashi and Nakshatra calculations
+2. Match compatibility algorithm
+3. PDF generation with multilingual support
+4. Secure data handling
+5. API documentation
+6. Places database maintenance
+
+## Additional Notes
+- All calculations should follow South Indian astrology principles
+- Rashi and Nakshatra calculations should be automated based on birth details
+- Reports should be culturally appropriate for South Indian context
+- System should handle timezone conversions appropriately
+- Place names should be comprehensive for South Indian regions
+- UI components should follow South Indian cultural context 
