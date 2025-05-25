@@ -29,7 +29,7 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # Include routers
 app.include_router(horoscope.router, prefix="/api/horoscope", tags=["horoscope"])
-app.include_router(matchmaking.router, prefix="/api/matchmaking", tags=["matchmaking"])
+app.include_router(matchmaking.router, tags=["matchmaking"])
 app.include_router(reports.router, prefix="/api/reports", tags=["reports"])
 app.include_router(translations.router, prefix="/api/translations", tags=["translations"])
 app.include_router(places.router, prefix="/api/places", tags=["places"])
@@ -37,3 +37,9 @@ app.include_router(places.router, prefix="/api/places", tags=["places"])
 @app.get("/")
 async def root():
     return {"message": "Welcome to Epic-X Horoscope API"}
+
+@app.on_event("startup")
+async def list_routes():
+    print("=== Registered Routes ===")
+    for route in app.routes:
+        print(route.path)

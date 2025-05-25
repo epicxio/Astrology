@@ -2,9 +2,6 @@ from pydantic_settings import BaseSettings
 from typing import Optional
 
 class Settings(BaseSettings):
-    # Database settings
-    DATABASE_URL: str = "mysql+pymysql://root:password@localhost/epic_x_horoscope"
-    
     # JWT settings
     SECRET_KEY: str = "your-secret-key-here"
     ALGORITHM: str = "HS256"

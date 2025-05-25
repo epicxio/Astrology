@@ -1,6 +1,7 @@
-from sqlalchemy import Column, String, ForeignKey, Numeric, Date, Time
+from sqlalchemy import Column, String, ForeignKey, Numeric, Date, Time, DateTime
 from sqlalchemy.orm import relationship
 from .base import BaseModel
+from datetime import datetime
 
 class Matchmaking(BaseModel):
     __tablename__ = "matchmaking_results"
@@ -18,6 +19,10 @@ class Matchmaking(BaseModel):
     compatibility_score = Column(Numeric(5, 2), nullable=False)
     compatibility = Column(String(50), nullable=False)
     remarks = Column(String(500), nullable=False)
+
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    last_accessed_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     # Relationships
     bride_place = relationship("Place", foreign_keys=[bride_place_id])

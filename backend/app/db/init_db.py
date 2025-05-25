@@ -1,6 +1,10 @@
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
-from app.models import Base, Place, Horoscope, Translation, Matchmaking
+from app.models.base import Base
+from app.models.place import Place
+from app.models.horoscope import Horoscope
+from app.models.translation import Translation
+from app.models.matchmaking import Matchmaking
 from app.db.session import engine, SessionLocal
 from app.data.indian_districts import INDIAN_DISTRICTS
 import logging

@@ -6,12 +6,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./horoscope.db")
+# Use the correct SQLite database file
+SQLALCHEMY_DATABASE_URL = "sqlite:///./horoscope.db"
 
 # Create SQLAlchemy engine
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False} if SQLALCHEMY_DATABASE_URL.startswith("sqlite") else {}
+    connect_args={"check_same_thread": False}  # Needed for SQLite
 )
 
 # Create session factory
