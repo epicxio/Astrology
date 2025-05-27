@@ -32,6 +32,7 @@ class HoroscopeResponse(HoroscopeBase):
     rasi_lord: Optional[str] = None
     lagna_lord: Optional[str] = None
     nakshatra_lord: Optional[str] = None
+    chart_image: Optional[str] = None
 
     class Config:
         from_attributes = True 

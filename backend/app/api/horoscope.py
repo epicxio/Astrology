@@ -15,6 +15,7 @@ import pytz
 from fastapi.responses import FileResponse
 from app.services.horoscope_chart import plot_planetary_positions, plot_south_indian_chart
 import os
+import logging
 
 router = APIRouter()
 
@@ -36,7 +37,7 @@ def parse_time_string(time_str):
 @router.post("/", response_model=HoroscopeResponse)
 @router.post("/calculate", response_model=HoroscopeResponse)
 async def create_horoscope(horoscope: HoroscopeCreate, db: Session = Depends(get_db)):
-    """Create a new horoscope calculation."""
+    """Create a new horoscope calculation and save it to the SQLite horoscopes table."""
     try:
         # Parse date and time
         try:
@@ -133,6 +134,25 @@ async def create_horoscope(horoscope: HoroscopeCreate, db: Session = Depends(get
             print(f"Latitude: {place.latitude}, Longitude: {place.longitude}")
             print(f"Ascendant longitude: {horoscope_data['ascendant_long']}")
             print(f"Lagna index: {int(horoscope_data['ascendant_long'] // 30) % 12}, Lagna: {horoscope_data['lagna']}")
+
+            # Generate and save South Indian Style Rasi Chart
+            planetary_positions = horoscope_data['planetary_positions']
+            birth_details = [
+                date_of_birth.strftime("%d - %B - %Y"),
+                time_of_birth.strftime("%H : %M : %S"),
+                "Rasi", horoscope_data['rashi'],
+                horoscope_data['nakshatra']
+            ]
+            chart_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static", "horoscope_charts")
+            os.makedirs(chart_folder, exist_ok=True)
+            chart_filename = f"south_indian_chart_{datetime.now().strftime('%Y%m%d%H%M%S')}_{horoscope.name}.png"
+            chart_path = os.path.join(chart_folder, chart_filename)
+            try:
+                plot_south_indian_chart(planetary_positions, filename=chart_path, birth_details=birth_details)
+            except Exception as chart_exc:
+                logging.error(f"Failed to generate or save chart: {chart_exc}")
+                chart_path = None
+
         except Exception as e:
             raise HTTPException(
                 status_code=400,
@@ -157,7 +177,8 @@ async def create_horoscope(horoscope: HoroscopeCreate, db: Session = Depends(get
                 rashi=horoscope_data['rashi'],
                 nakshatra=horoscope_data['nakshatra'],
                 lagna=horoscope_data['lagna'],
-                planetary_positions=json.dumps(horoscope_data['planetary_positions'])
+                planetary_positions=json.dumps(horoscope_data['planetary_positions']),
+                chart_image=chart_path
             )
             db.add(db_horoscope)
             db.commit()
@@ -193,7 +214,8 @@ async def create_horoscope(horoscope: HoroscopeCreate, db: Session = Depends(get
             ascendant_long=horoscope_data.get('ascendant_long'),
             rasi_lord=horoscope_data.get('rasi_lord'),
             lagna_lord=horoscope_data.get('lagna_lord'),
-            nakshatra_lord=horoscope_data.get('nakshatra_lord')
+            nakshatra_lord=horoscope_data.get('nakshatra_lord'),
+            chart_image=db_horoscope.chart_image
         )
         
     except HTTPException:
@@ -242,7 +264,8 @@ async def get_horoscope(horoscope_id: int, db: Session = Depends(get_db)):
         nakshatra=horoscope.nakshatra,
         lagna=horoscope.lagna,
         planetary_positions=json.loads(horoscope.planetary_positions),
-        predictions=predictions.dict()
+        predictions=predictions.dict(),
+        chart_image=horoscope.chart_image
     )
 
 @router.get("/", response_model=List[HoroscopeResponse])
@@ -272,7 +295,8 @@ async def list_horoscopes(skip: int = 0, limit: int = 100, db: Session = Depends
                 nakshatra=horoscope.nakshatra,
                 lagna=horoscope.lagna,
                 planetary_positions=json.loads(horoscope.planetary_positions),
-                predictions=predictions.dict()
+                predictions=predictions.dict(),
+                chart_image=horoscope.chart_image
             ))
     return results
 

@@ -173,4 +173,48 @@ async def get_places():
         # TODO: Implement getting places from database
         return []
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) 
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/", response_model=List[MatchmakingResponse])
+async def list_matchmakings(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    results = db.query(Matchmaking).offset(skip).limit(limit).all()
+    response = []
+    for result in results:
+        bride_place = db.query(Place).filter(Place.id == result.bride_place_id).first()
+        groom_place = db.query(Place).filter(Place.id == result.groom_place_id).first()
+        # Recalculate guna_table and related fields for each record
+        calc_result = MatchMakingCalculator.calculate_compatibility(
+            bride_name=result.bride_name,
+            bride_dob=result.bride_dob,
+            bride_tob=result.bride_tob,
+            bride_place_id=result.bride_place_id,
+            groom_name=result.groom_name,
+            groom_dob=result.groom_dob,
+            groom_tob=result.groom_tob,
+            groom_place_id=result.groom_place_id,
+            db=db
+        )
+        response.append(MatchmakingResponse(
+            id=result.id,
+            bride_name=result.bride_name,
+            bride_dob=result.bride_dob,
+            bride_tob=result.bride_tob,
+            bride_place=bride_place.name if bride_place else None,
+            groom_name=result.groom_name,
+            groom_dob=result.groom_dob,
+            groom_tob=result.groom_tob,
+            groom_place=groom_place.name if groom_place else None,
+            guna_score=float(result.compatibility_score),
+            compatibility=result.compatibility,
+            remarks=result.remarks,
+            guna_table=calc_result.get("guna_table", []),
+            total_points=calc_result.get("total_points", 0),
+            max_points=calc_result.get("max_points", 0),
+            percentage=calc_result.get("percentage", 0),
+            compatibility_analysis=calc_result.get("compatibility_analysis", ""),
+            bride_horoscope=calc_result.get("bride_horoscope", {}),
+            groom_horoscope=calc_result.get("groom_horoscope", {}),
+            created_at=result.created_at,
+            last_accessed_at=result.last_accessed_at
+        ))
+    return response 

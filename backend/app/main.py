@@ -5,6 +5,7 @@ from .api import horoscope, matchmaking, reports, translations, places
 from .db.session import engine
 from .models import Base
 from .core.config import settings
+import os
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -25,7 +26,8 @@ app.add_middleware(
 )
 
 # Mount static files
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+static_dir = os.path.join(os.path.dirname(__file__), "static")
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 # Include routers
 app.include_router(horoscope.router, prefix="/api/horoscope", tags=["horoscope"])
