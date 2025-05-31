@@ -334,9 +334,14 @@ async def get_horoscope_chart(horoscope_id: int, db: Session = Depends(get_db)):
         planetary_positions = json.loads(horoscope.planetary_positions)
     else:
         planetary_positions = horoscope.planetary_positions
+    # Always use static/horoscope_charts for chart storage
+    chart_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static", "horoscope_charts")
+    os.makedirs(chart_folder, exist_ok=True)
     filename = f"horoscope_chart_{horoscope_id}.png"
-    filepath = os.path.join("/tmp", filename)
-    plot_planetary_positions(planetary_positions, filename=filepath)
+    filepath = os.path.join(chart_folder, filename)
+    # Only generate if it doesn't exist
+    if not os.path.exists(filepath):
+        plot_planetary_positions(planetary_positions, filename=filepath)
     return FileResponse(filepath, media_type="image/png", filename=filename)
 
 @router.get("/chart/south/{horoscope_id}")
@@ -356,7 +361,12 @@ async def get_south_indian_chart(horoscope_id: int, db: Session = Depends(get_db
         f"Rasi", horoscope.rashi,
         horoscope.nakshatra
     ]
+    # Always use static/horoscope_charts for chart storage
+    chart_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static", "horoscope_charts")
+    os.makedirs(chart_folder, exist_ok=True)
     filename = f"south_indian_chart_{horoscope_id}.png"
-    filepath = os.path.join("/tmp", filename)
-    plot_south_indian_chart(planetary_positions, filename=filepath, birth_details=birth_details)
+    filepath = os.path.join(chart_folder, filename)
+    # Only generate if it doesn't exist
+    if not os.path.exists(filepath):
+        plot_south_indian_chart(planetary_positions, filename=filepath, birth_details=birth_details)
     return FileResponse(filepath, media_type="image/png", filename=filename) 
