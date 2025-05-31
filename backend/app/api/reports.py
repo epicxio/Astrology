@@ -4,6 +4,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 import os
 from datetime import datetime
+import json
 
 from ..models.horoscope import Horoscope
 from ..models.matchmaking import Matchmaking
@@ -31,19 +32,63 @@ async def get_horoscope_report(
         if not place:
             raise HTTPException(status_code=404, detail="Place not found")
 
-        report = pdf_generator.generate_horoscope_report(
-            horoscope=horoscope,
-            place=place,
-            language=language
-        )
+        # Build a summarized planetary positions string for the PDF
+        try:
+            pp = horoscope.planetary_positions
+            print(f"DEBUG: Type of planetary_positions: {type(pp)}")
+            if isinstance(pp, str):
+                pp_dict = json.loads(pp)
+            else:
+                pp_dict = pp
+            pp_summary = []
+            for planet, pos in pp_dict.items():
+                summary = f"{planet}: {pos.get('rasi', '')} ({pos.get('dms', '')}), Nakshatra: {pos.get('nakshatra', '')}"
+                pp_summary.append(summary)
+            planetary_positions_str = "\n".join(pp_summary)
+        except Exception as e:
+            print(f"DEBUG: Error parsing planetary_positions: {e}")
+            planetary_positions_str = "Could not parse planetary positions"
 
-        return FileResponse(
-            path=report,
-            filename=f"horoscope_{horoscope_id}.pdf",
-            media_type="application/pdf"
-        )
+        # Parse planetary strengths for the PDF
+        try:
+            ps = getattr(horoscope, 'planetary_strengths', None)
+            if ps:
+                if isinstance(ps, str):
+                    ps_dict = json.loads(ps)
+                else:
+                    ps_dict = ps
+            else:
+                ps_dict = {}
+        except Exception as e:
+            print(f"DEBUG: Error parsing planetary_strengths: {e}")
+            ps_dict = {}
+
+        data = {
+            "name": horoscope.name,
+            "dob": horoscope.date_of_birth.strftime("%Y-%m-%d"),
+            "tob": horoscope.time_of_birth.strftime("%H:%M:%S"),
+            "place": place.name,
+            "rashi": horoscope.rashi,
+            "nakshatra": horoscope.nakshatra,
+            "lagna": horoscope.lagna,
+            "planetary_positions": planetary_positions_str,
+            "planetary_strengths": ps_dict
+        }
+        print(f"DEBUG: Horoscope PDF data: {data}")
+        try:
+            report = pdf_generator.generate_horoscope_pdf(data, language)
+            print(f"DEBUG: PDF generated at {report}")
+            return FileResponse(
+                path=report,
+                filename=f"horoscope_{horoscope_id}.pdf",
+                media_type="application/pdf"
+            )
+        except Exception as e:
+            print(f"DEBUG: Exception during PDF generation or FileResponse: {e}")
+            raise HTTPException(status_code=500, detail=f"PDF generation failed: {e}")
 
     except Exception as e:
+        print(f"DEBUG: Exception occurred in get_horoscope_report: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/matchmaking/{matchmaking_id}")

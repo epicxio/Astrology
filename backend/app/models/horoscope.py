@@ -20,6 +20,7 @@ class Horoscope(BaseModel):
     lagna = Column(String(20), nullable=False)
     planetary_positions = Column(Text, nullable=False)
     chart_image = Column(String(255), nullable=True)
+    planetary_strengths = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

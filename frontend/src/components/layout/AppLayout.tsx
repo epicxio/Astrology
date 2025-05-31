@@ -51,27 +51,45 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   return (
     <Layout className="min-h-screen">
-      <Header className="flex justify-between items-center px-6 bg-white shadow">
+      <Header className="flex justify-between items-center px-6 bg-white/95 backdrop-blur-md border-b border-gray-100 fixed w-full z-50">
         <div className="flex items-center">
-          <h1 className="text-xl font-bold text-gray-800 mr-8">
-            {t('common.welcome')}
-          </h1>
+          <img src="/astrology-logo.png" alt="Astrology Logo" style={{ height: 55, marginRight: 12, objectFit: 'contain' }} />
           <Menu
             mode="horizontal"
             selectedKeys={[location.pathname]}
             items={menuItems}
             onClick={({ key }) => handleMenuClick(key)}
-            className="border-0"
-          />
+            className="border-0 bg-transparent"
+            style={{ 
+              background: 'transparent',
+              border: 'none',
+              fontSize: '15px',
+              fontWeight: 500
+            }}
+          >
+            {menuItems.map((item) => (
+              <Menu.Item
+                key={item.key}
+                className={`relative px-4 py-2 rounded-lg font-medium text-gray-600 hover:text-gray-900 transition-all duration-200
+                  ${location.pathname === item.key ? 'text-gray-900' : 'text-gray-600'}
+                  hover:bg-gray-50`}
+              >
+                {item.label}
+                {location.pathname === item.key && (
+                  <span className="absolute left-1/2 -translate-x-1/2 bottom-0 h-0.5 w-4/5 bg-gray-900 rounded-full"></span>
+                )}
+              </Menu.Item>
+            ))}
+          </Menu>
         </div>
-        <Space>
-          <LanguageSelector
-            value={currentLanguage}
-            onChange={handleLanguageChange}
-          />
-        </Space>
+        <LanguageSelector
+          value={currentLanguage}
+          onChange={handleLanguageChange}
+        />
       </Header>
-      <Content className="p-6">{children}</Content>
+      <Content className="pt-16">
+        {children}
+      </Content>
     </Layout>
   );
 };

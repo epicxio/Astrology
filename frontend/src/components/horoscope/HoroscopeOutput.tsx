@@ -1,4 +1,5 @@
 import React from "react";
+import PlanetaryStrengthCard from "./PlanetaryStrengthCard";
 
 type PlanetaryPosition = {
   longitude: number;
@@ -39,6 +40,17 @@ type HoroscopeResultType = {
   rasi_lord?: string;
   lagna_lord?: string;
   nakshatra_lord?: string;
+  planetary_strengths?: {
+    [planet: string]: {
+      sthana_bala: number;
+      dig_bala: number;
+      drik_bala: number;
+      conjunction: number;
+      avastha: number;
+      navamsa: number;
+      total: number;
+    };
+  };
 };
 
 type HoroscopeOutputProps = {
@@ -63,6 +75,10 @@ const HoroscopeOutput: React.FC<HoroscopeOutputProps> = ({ result }) => {
 
   // Debug: Log the full API response
   console.log('Horoscope API result:', result);
+  console.log('planetary_strengths:', result.planetary_strengths);
+
+  // Defensive: check if planetary_strengths is a non-empty object
+  const hasStrengths = result.planetary_strengths && Object.keys(result.planetary_strengths).length > 0;
 
   return (
     <div className="horoscope-output-window" style={{
@@ -94,6 +110,39 @@ const HoroscopeOutput: React.FC<HoroscopeOutputProps> = ({ result }) => {
         <strong>Lagna Lord for this chart:</strong> {result.lagna_lord || 'N/A'}<br />
         <strong>Nakshatra Lord for this chart:</strong> {result.nakshatra_lord || 'N/A'}
       </div>
+
+      {/* Planetary Strength Analysis */}
+      {hasStrengths && (
+        <div className="mt-8">
+          <h3 className="text-xl font-bold mb-4">Planetary Strength Analysis</h3>
+          <div className="grid grid-cols-1 gap-6">
+            {Object.entries(result.planetary_strengths!).map(([planet, strengths]) => {
+              // Defensive: ensure strengths is an object with required fields
+              if (!strengths || typeof strengths !== 'object' || !('total' in strengths)) {
+                return (
+                  <div key={planet} style={{ color: 'red' }}>
+                    Error: Invalid strengths data for {planet}
+                  </div>
+                );
+              }
+              return (
+                <PlanetaryStrengthCard
+                  key={planet}
+                  planet={planet}
+                  strengths={strengths}
+                  planetaryPositions={result.planetary_positions}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
+      {!hasStrengths && (
+        <div style={{ color: 'red', margin: '16px 0' }}>
+          No planetary strengths data available.
+        </div>
+      )}
+
       <h3>Predictions</h3>
       <ul>
         <li><strong>Career:</strong> {result.predictions?.career || "N/A"}</li>

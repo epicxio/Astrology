@@ -2,6 +2,7 @@ from datetime import date, time, datetime
 from typing import Dict, Any
 import swisseph as swe
 import pytz
+from .planetary_strength import compute_planet_strengths
 
 RASHIS = [
     "Mesha", "Vrishabha", "Mithuna", "Kataka", "Simha", "Kanya",
@@ -173,6 +174,9 @@ def calculate_horoscope(
     print(f"Nakshatra Lord: {nakshatra_lord}")
     print(f"Ascendant Longitude: {sidereal_ascendant}")
 
+    # Calculate planetary strengths
+    planetary_strengths = compute_planet_strengths(planetary_positions)
+
     return {
         'rashi': rashi,
         'nakshatra': nakshatra,
@@ -182,4 +186,5 @@ def calculate_horoscope(
         'rasi_lord': rasi_lord,
         'lagna_lord': lagna_lord,
         'nakshatra_lord': nakshatra_lord,
+        'planetary_strengths': planetary_strengths
     } 

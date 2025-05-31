@@ -22,8 +22,8 @@ const AppLayout: React.FC<LayoutProps> = ({
     <AntLayout className="min-h-screen">
       <Header className="flex items-center justify-between bg-white shadow">
         <div className="flex items-center">
-          <Link to="/" className="text-xl font-bold text-blue-600">
-            Epic-X Horoscope
+          <Link to="/" className="flex items-center">
+            <img src="/astrology-logo.png" alt="Astrology Logo" style={{ height: 70, marginRight: 12 }} />
           </Link>
           <Menu
             mode="horizontal"

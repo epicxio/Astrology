@@ -96,11 +96,15 @@ class PDFGenerator:
 
         # Horoscope Details
         story.append(Paragraph("Horoscope Details", self.styles['Heading2']))
+        # Wrap planetary positions in a Paragraph for text wrapping
+        planetary_positions = data.get('planetary_positions', '')
+        if planetary_positions:
+            planetary_positions = Paragraph(planetary_positions, self.styles['Normal'])
         horoscope_data = [
             ["Rashi", data.get('rashi', '')],
             ["Nakshatra", data.get('nakshatra', '')],
             ["Lagna", data.get('lagna', '')],
-            ["Planetary Positions", data.get('planetary_positions', '')]
+            ["Planetary Positions", planetary_positions]
         ]
         table = Table(horoscope_data, colWidths=[2*inch, 4*inch])
         table.setStyle(TableStyle([
@@ -117,6 +121,47 @@ class PDFGenerator:
             ('GRID', (0, 0), (-1, -1), 1, colors.black)
         ]))
         story.append(table)
+
+        # Planetary Strength Analysis
+        story.append(Spacer(1, 12))
+        story.append(Paragraph("Planetary Strength Analysis", self.styles['Heading2']))
+        strengths = data.get('planetary_strengths', {})
+        def fmt(val):
+            try:
+                f = float(val)
+                return f"{f:.2f}"
+            except Exception:
+                return str(val)
+        if strengths and isinstance(strengths, dict) and len(strengths) > 0:
+            # Table header
+            strength_table_data = [["Planet", "Sthana Bala", "Dig Bala", "Drik Bala", "Conjunction", "Avastha", "Navamsa", "Total"]]
+            for planet, vals in strengths.items():
+                strength_table_data.append([
+                    planet,
+                    fmt(vals.get('sthana_bala', '')),
+                    fmt(vals.get('dig_bala', '')),
+                    fmt(vals.get('drik_bala', '')),
+                    fmt(vals.get('conjunction', '')),
+                    fmt(vals.get('avastha', '')),
+                    fmt(vals.get('navamsa', '')),
+                    fmt(vals.get('total', ''))
+                ])
+            strength_table = Table(strength_table_data, colWidths=[1*inch, 0.9*inch, 0.9*inch, 0.9*inch, 1*inch, 0.9*inch, 0.9*inch, 0.9*inch])
+            strength_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+                ('FONTNAME', (0, 1), (-1, -1), self._get_style_for_language(language)),
+                ('FONTSIZE', (0, 1), (-1, -1), 11),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black)
+            ]))
+            story.append(strength_table)
+        else:
+            story.append(Paragraph("No planetary strength data available.", self.styles['Normal']))
 
         # Generate PDF
         doc.build(story)

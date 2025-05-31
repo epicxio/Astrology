@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Dict
 from ..db.session import get_db
 from ..schemas.horoscope import HoroscopeCreate, HoroscopeResponse
 from ..services.horoscope_calculator import calculate_horoscope
@@ -16,6 +16,7 @@ from fastapi.responses import FileResponse
 from app.services.horoscope_chart import plot_planetary_positions, plot_south_indian_chart
 import os
 import logging
+from sqlalchemy import Column, Text
 
 router = APIRouter()
 
@@ -178,6 +179,7 @@ async def create_horoscope(horoscope: HoroscopeCreate, db: Session = Depends(get
                 nakshatra=horoscope_data['nakshatra'],
                 lagna=horoscope_data['lagna'],
                 planetary_positions=json.dumps(horoscope_data['planetary_positions']),
+                planetary_strengths=json.dumps(horoscope_data['planetary_strengths']),
                 chart_image=chart_path
             )
             db.add(db_horoscope)
@@ -210,6 +212,7 @@ async def create_horoscope(horoscope: HoroscopeCreate, db: Session = Depends(get
             nakshatra=db_horoscope.nakshatra,
             lagna=db_horoscope.lagna,
             planetary_positions=json.loads(db_horoscope.planetary_positions),
+            planetary_strengths=json.loads(db_horoscope.planetary_strengths) if db_horoscope.planetary_strengths else None,
             predictions=predictions.dict(),
             ascendant_long=horoscope_data.get('ascendant_long'),
             rasi_lord=horoscope_data.get('rasi_lord'),
@@ -251,6 +254,12 @@ async def get_horoscope(horoscope_id: int, db: Session = Depends(get_db)):
         finance="Good period for investments",
         bestMatches=["Mesha", "Vrishabha", "Mithuna"]
     )
+    planetary_strengths = horoscope.planetary_strengths
+    if isinstance(planetary_strengths, str):
+        try:
+            planetary_strengths = json.loads(planetary_strengths)
+        except Exception:
+            planetary_strengths = None
     return HoroscopeResponse(
         id=horoscope.id,
         name=horoscope.name,
@@ -264,6 +273,7 @@ async def get_horoscope(horoscope_id: int, db: Session = Depends(get_db)):
         nakshatra=horoscope.nakshatra,
         lagna=horoscope.lagna,
         planetary_positions=json.loads(horoscope.planetary_positions),
+        planetary_strengths=planetary_strengths,
         predictions=predictions.dict(),
         chart_image=horoscope.chart_image
     )
@@ -282,6 +292,19 @@ async def list_horoscopes(skip: int = 0, limit: int = 100, db: Session = Depends
                 finance="Good period for investments",
                 bestMatches=["Mesha", "Vrishabha", "Mithuna"]
             )
+            # Always include planetary_positions as a dict
+            planetary_positions = horoscope.planetary_positions
+            if isinstance(planetary_positions, str):
+                try:
+                    planetary_positions = json.loads(planetary_positions)
+                except Exception:
+                    planetary_positions = {}
+            planetary_strengths = horoscope.planetary_strengths
+            if isinstance(planetary_strengths, str):
+                try:
+                    planetary_strengths = json.loads(planetary_strengths)
+                except Exception:
+                    planetary_strengths = None
             results.append(HoroscopeResponse(
                 id=horoscope.id,
                 name=horoscope.name,
@@ -294,7 +317,8 @@ async def list_horoscopes(skip: int = 0, limit: int = 100, db: Session = Depends
                 rashi=horoscope.rashi,
                 nakshatra=horoscope.nakshatra,
                 lagna=horoscope.lagna,
-                planetary_positions=json.loads(horoscope.planetary_positions),
+                planetary_positions=planetary_positions,
+                planetary_strengths=planetary_strengths,
                 predictions=predictions.dict(),
                 chart_image=horoscope.chart_image
             ))

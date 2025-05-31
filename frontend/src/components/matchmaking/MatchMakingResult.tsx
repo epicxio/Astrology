@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Card, Button, message } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Button, message, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { apiService } from '../../services/api';
@@ -33,14 +33,46 @@ interface MatchMakingResult {
   groom_horoscope: { rashi: string; nakshatra: string };
 }
 
+const GUNA_TOOLTIPS = {
+  kuta: 'Aspect of compatibility',
+  bride_value: 'Bride\'s value',
+  groom_value: 'Groom\'s value',
+  description: 'Area of life',
+  points: 'Points scored',
+  max_points: 'Maximum possible points',
+};
+
+const LANGUAGES = [
+  { code: 'en', label: 'English' },
+  { code: 'ml', label: 'Malayalam' },
+  { code: 'ta', label: 'Tamil' },
+];
+
 const MatchMakingResult: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const [currentLanguage, setCurrentLanguage] = useState('en');
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const result = location.state?.result as MatchMakingResult;
+  const bride_avatar = location.state?.bride_avatar || '🦸‍♀️';
+  const groom_avatar = location.state?.groom_avatar || '🦸‍♂️';
+
+  useEffect(() => {
+    // Confetti animation when result is shown
+    if (result && typeof window !== 'undefined') {
+      import('canvas-confetti').then((confetti) => {
+        confetti.default({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.6 },
+          colors: ['#a21caf', '#2563eb', '#f472b6', '#facc15', '#38bdf8'],
+        });
+      });
+    }
+  }, [result]);
 
   console.log('DEBUG: Frontend result =', result);
   if (result) {
@@ -57,102 +89,89 @@ const MatchMakingResult: React.FC = () => {
   const handleDownloadPDF = async () => {
     try {
       setLoading(true);
+      setSuccess(false);
       const blob = await apiService.getMatchMakingReport(result.id, currentLanguage);
       downloadPDF(blob, getReportFilename('matchmaking', currentLanguage));
+      setSuccess(true);
       message.success(t('matchmaking.downloadSuccess') || 'PDF downloaded successfully');
     } catch (error) {
       console.error('Error downloading PDF:', error);
       message.error(t('common.errorDownloadingPDF') || 'Error downloading PDF');
     } finally {
       setLoading(false);
+      setTimeout(() => setSuccess(false), 3000);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">{t('matchmaking.result') || 'Matchmaking Result'}</h1>
-        <LanguageSelector value={currentLanguage} onChange={setCurrentLanguage} />
-      </div>
-
-      <Card className="mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Bride's Information */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4">{t('matchmaking.brideInfo') || "Bride's Information"}</h2>
-            <div className="space-y-2">
-              <p><strong>{t('matchmaking.name') || 'Name'}:</strong> {result.bride_name}</p>
-              <p><strong>{t('matchmaking.dob') || 'Date of Birth'}:</strong> {result.bride_dob}</p>
-              <p><strong>{t('matchmaking.tob') || 'Time of Birth'}:</strong> {result.bride_tob}</p>
-              <p><strong>Rasi:</strong> {result.bride_horoscope?.rashi}</p>
-              <p><strong>Nakshatra:</strong> {result.bride_horoscope?.nakshatra}</p>
-            </div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f6f7fb] p-2 animate-fade-in">
+      <div className="w-full max-w-2xl bg-[#e7eaf3] rounded-3xl shadow-2xl p-4 sm:p-8 flex flex-col items-center">
+        <div className="flex flex-col sm:flex-row gap-6 w-full mb-6 justify-center items-center">
+          {/* Groom Card */}
+          <div className="flex flex-col items-center bg-white/20 rounded-2xl p-4 shadow-lg w-full sm:w-1/2">
+            <div className="text-5xl mb-2">{groom_avatar}</div>
+            <div className="font-bold text-lg text-white mb-1">{result.groom_name}</div>
+            <div className="text-white/80 text-sm mb-1">DOB: {result.groom_dob}</div>
+            <div className="text-white/80 text-sm mb-1">TOB: {result.groom_tob}</div>
+            <div className="text-white/80 text-sm mb-1">Rasi: {result.groom_horoscope?.rashi}</div>
+            <div className="text-white/80 text-sm">Nakshatra: {result.groom_horoscope?.nakshatra}</div>
           </div>
-
-          {/* Groom's Information */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4">{t('matchmaking.groomInfo') || "Groom's Information"}</h2>
-            <div className="space-y-2">
-              <p><strong>{t('matchmaking.name') || 'Name'}:</strong> {result.groom_name}</p>
-              <p><strong>{t('matchmaking.dob') || 'Date of Birth'}:</strong> {result.groom_dob}</p>
-              <p><strong>{t('matchmaking.tob') || 'Time of Birth'}:</strong> {result.groom_tob}</p>
-              <p><strong>Rasi:</strong> {result.groom_horoscope?.rashi}</p>
-              <p><strong>Nakshatra:</strong> {result.groom_horoscope?.nakshatra}</p>
-            </div>
+          {/* Bride Card */}
+          <div className="flex flex-col items-center bg-white/20 rounded-2xl p-4 shadow-lg w-full sm:w-1/2">
+            <div className="text-5xl mb-2">{bride_avatar}</div>
+            <div className="font-bold text-lg text-white mb-1">{result.bride_name}</div>
+            <div className="text-white/80 text-sm mb-1">DOB: {result.bride_dob}</div>
+            <div className="text-white/80 text-sm mb-1">TOB: {result.bride_tob}</div>
+            <div className="text-white/80 text-sm mb-1">Rasi: {result.bride_horoscope?.rashi}</div>
+            <div className="text-white/80 text-sm">Nakshatra: {result.bride_horoscope?.nakshatra}</div>
           </div>
         </div>
-      </Card>
-
-      <Card className="mb-6">
-        <h2 className="text-xl font-semibold mb-4">Guna Milan Analysis</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full border text-center">
-            <thead className="bg-blue-900 text-white">
-              <tr>
-                <th className="px-4 py-2">Kuta</th>
-                <th className="px-4 py-2">Bride Value</th>
-                <th className="px-4 py-2">Groom Value</th>
-                <th className="px-4 py-2">Area of Life</th>
-                <th className="px-4 py-2">Points</th>
-                <th className="px-4 py-2">Maximum</th>
-              </tr>
-            </thead>
-            <tbody>
-              {result.guna_table.map((row, idx) => (
-                <tr key={idx} className="border-b">
-                  <td className="px-4 py-2 font-semibold">{row.kuta}</td>
-                  <td className="px-4 py-2">{row.bride_value}</td>
-                  <td className="px-4 py-2">{row.groom_value}</td>
-                  <td className="px-4 py-2">{row.description}</td>
-                  <td className="px-4 py-2">{row.points}</td>
-                  <td className="px-4 py-2">{row.max_points}</td>
-                </tr>
+        {/* Guna Milan Table */}
+        <div className="w-full mb-6 overflow-x-auto">
+          <div className="text-lg font-semibold mb-2 text-white/80">Guna Milan Analysis</div>
+          <div className="min-w-[600px] grid grid-cols-6 gap-2 bg-gradient-to-r from-blue-900/60 to-pink-900/40 rounded-xl p-2 text-white text-xs sm:text-sm">
+            <Tooltip title={GUNA_TOOLTIPS.kuta}><div className="font-bold">Kuta</div></Tooltip>
+            <Tooltip title={GUNA_TOOLTIPS.bride_value}><div className="font-bold">Bride</div></Tooltip>
+            <Tooltip title={GUNA_TOOLTIPS.groom_value}><div className="font-bold">Groom</div></Tooltip>
+            <Tooltip title={GUNA_TOOLTIPS.description}><div className="font-bold">Area</div></Tooltip>
+            <Tooltip title={GUNA_TOOLTIPS.points}><div className="font-bold">Points</div></Tooltip>
+            <Tooltip title={GUNA_TOOLTIPS.max_points}><div className="font-bold">Max</div></Tooltip>
+            {result.guna_table.map((row: any, idx: number) => (
+              <React.Fragment key={idx}>
+                <div className="py-1 font-semibold">{row.kuta}</div>
+                <div className="py-1">{row.bride_value}</div>
+                <div className="py-1">{row.groom_value}</div>
+                <div className="py-1">{row.description}</div>
+                <div className="py-1">{row.points}</div>
+                <div className="py-1">{row.max_points}</div>
+              </React.Fragment>
               ))}
-              <tr className="font-bold">
-                <td colSpan={4} className="px-4 py-2 text-right">Total</td>
-                <td className="px-4 py-2">{result.total_points}</td>
-                <td className="px-4 py-2">{result.max_points}</td>
-              </tr>
-            </tbody>
-          </table>
+            {/* Totals row */}
+            <div className="col-span-4 text-right font-bold py-1">Total</div>
+            <div className="py-1 font-bold">{result.total_points}</div>
+            <div className="py-1 font-bold">{result.max_points}</div>
+          </div>
         </div>
-      </Card>
-
-      <Card className="mb-6">
-        <h2 className="text-xl font-semibold mb-4">Compatibility Analysis</h2>
-        <div className="space-y-4">
-          <p>{result.compatibility_analysis}</p>
+        {/* Compatibility Analysis */}
+        <div className="w-full mb-6">
+          <div className="text-lg font-semibold mb-2 text-white/80">Compatibility Analysis</div>
+          <div className="bg-white/20 rounded-xl p-4 text-white/90 shadow-md text-base sm:text-lg">
+            {result.compatibility_analysis}
+          </div>
         </div>
-      </Card>
-
-      <div className="mt-6 flex justify-center">
+        {/* PDF Download */}
+        <div className="flex flex-col sm:flex-row items-center gap-2 mt-2">
+          <LanguageSelector value={currentLanguage} onChange={setCurrentLanguage} />
         <Button
           type="primary"
           onClick={handleDownloadPDF}
           loading={loading}
+            className="rounded-xl px-4 py-2 bg-gradient-to-r from-pink-500 to-blue-500 text-white font-bold hover:scale-105 border-none text-sm sm:text-base"
         >
-          {t('matchmaking.downloadPDF') || 'Download PDF'}
+            {loading ? 'Downloading...' : 'Download PDF'}
         </Button>
+        </div>
+        {success && <div className="text-green-400 mt-2">PDF downloaded successfully!</div>}
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { MatchMakingRecord } from '../components/matchmaking/MatchMakingRecord';
 
 // Base URL for API requests
 const BASE_URL = 'http://localhost:5001/api';
@@ -89,6 +90,10 @@ export const apiService = {
             params: { language },
             responseType: 'blob'
         });
+        if (response.data.type !== "application/pdf") {
+            const text = await response.data.text();
+            throw new Error(text || "Server did not return a PDF file.");
+        }
         return response.data;
     },
 
@@ -104,6 +109,12 @@ export const apiService = {
             responseType: 'blob'
         });
         return response.data;
+    },
+
+    getMatchMakingRecords: async (): Promise<MatchMakingRecord[]> => {
+        const response = await fetch(`${BASE_URL}/matchmaking/`);
+        if (!response.ok) throw new Error('Failed to fetch matchmaking records');
+        return response.json();
     }
 };
 

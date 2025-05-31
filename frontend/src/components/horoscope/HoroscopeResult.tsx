@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import LanguageSelector from '../common/LanguageSelector';
 import { apiService } from '../../services/api';
 import { downloadPDF, getReportFilename } from '../../utils/pdfUtils';
+import PlanetaryStrengthCard from './PlanetaryStrengthCard';
 
 interface HoroscopeResultData {
   id: number;
@@ -21,6 +22,18 @@ interface HoroscopeResultData {
     bestMatches?: string[];
     avoidMatches?: string[];
   };
+  planetary_strengths?: {
+    [planet: string]: {
+      sthana_bala: number;
+      dig_bala: number;
+      drik_bala: number;
+      conjunction: number;
+      avastha: number;
+      navamsa: number;
+      total: number;
+    };
+  };
+  planetary_positions?: any;
 }
 
 const HoroscopeResult: React.FC = () => {
@@ -51,6 +64,9 @@ const HoroscopeResult: React.FC = () => {
       message.error(t('horoscope.downloadError') || 'Error downloading PDF');
     }
   };
+
+  console.log('HoroscopeResult location.state:', location.state);
+  console.log('HoroscopeResult result:', result);
 
   if (loading || !result) {
     return <div>Loading...</div>;
@@ -152,6 +168,22 @@ const HoroscopeResult: React.FC = () => {
               </div>
             </div>
           </section>
+
+          {result.planetary_strengths && Object.keys(result.planetary_strengths).length > 0 && (
+            <section>
+              <h2 className="text-xl font-semibold mb-4">Planetary Strength Analysis</h2>
+              <div className="space-y-6">
+                {Object.entries(result.planetary_strengths).map(([planet, strengths]) => (
+                  <PlanetaryStrengthCard
+                    key={planet}
+                    planet={planet}
+                    strengths={strengths}
+                    planetaryPositions={result.planetary_positions}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       </Card>
     </div>
