@@ -217,4 +217,13 @@ async def list_matchmakings(skip: int = 0, limit: int = 100, db: Session = Depen
             created_at=result.created_at,
             last_accessed_at=result.last_accessed_at
         ))
-    return response 
+    return response
+
+@router.delete("/{matchmaking_id}")
+def delete_matchmaking(matchmaking_id: int, db: Session = Depends(get_db)):
+    record = db.query(Matchmaking).filter(Matchmaking.id == matchmaking_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Matchmaking record not found")
+    db.delete(record)
+    db.commit()
+    return {"success": True} 

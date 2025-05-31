@@ -110,26 +110,26 @@ const MatchMakingResult: React.FC = () => {
           {/* Groom Card */}
           <div className="flex flex-col items-center bg-white/20 rounded-2xl p-4 shadow-lg w-full sm:w-1/2">
             <div className="text-5xl mb-2">{groom_avatar}</div>
-            <div className="font-bold text-lg text-white mb-1">{result.groom_name}</div>
-            <div className="text-white/80 text-sm mb-1">DOB: {result.groom_dob}</div>
-            <div className="text-white/80 text-sm mb-1">TOB: {result.groom_tob}</div>
-            <div className="text-white/80 text-sm mb-1">Rasi: {result.groom_horoscope?.rashi}</div>
-            <div className="text-white/80 text-sm">Nakshatra: {result.groom_horoscope?.nakshatra}</div>
+            <div className="font-bold text-lg text-black mb-1">{result.groom_name}</div>
+            <div className="text-gray-800 text-sm mb-1">DOB: {result.groom_dob}</div>
+            <div className="text-gray-800 text-sm mb-1">TOB: {result.groom_tob}</div>
+            <div className="text-gray-800 text-sm mb-1">Rasi: {result.groom_horoscope?.rashi}</div>
+            <div className="text-gray-800 text-sm">Nakshatra: {result.groom_horoscope?.nakshatra}</div>
           </div>
           {/* Bride Card */}
           <div className="flex flex-col items-center bg-white/20 rounded-2xl p-4 shadow-lg w-full sm:w-1/2">
             <div className="text-5xl mb-2">{bride_avatar}</div>
-            <div className="font-bold text-lg text-white mb-1">{result.bride_name}</div>
-            <div className="text-white/80 text-sm mb-1">DOB: {result.bride_dob}</div>
-            <div className="text-white/80 text-sm mb-1">TOB: {result.bride_tob}</div>
-            <div className="text-white/80 text-sm mb-1">Rasi: {result.bride_horoscope?.rashi}</div>
-            <div className="text-white/80 text-sm">Nakshatra: {result.bride_horoscope?.nakshatra}</div>
+            <div className="font-bold text-lg text-black mb-1">{result.bride_name}</div>
+            <div className="text-gray-800 text-sm mb-1">DOB: {result.bride_dob}</div>
+            <div className="text-gray-800 text-sm mb-1">TOB: {result.bride_tob}</div>
+            <div className="text-gray-800 text-sm mb-1">Rasi: {result.bride_horoscope?.rashi}</div>
+            <div className="text-gray-800 text-sm">Nakshatra: {result.bride_horoscope?.nakshatra}</div>
           </div>
         </div>
         {/* Guna Milan Table */}
         <div className="w-full mb-6 overflow-x-auto">
-          <div className="text-lg font-semibold mb-2 text-white/80">Guna Milan Analysis</div>
-          <div className="min-w-[600px] grid grid-cols-6 gap-2 bg-gradient-to-r from-blue-900/60 to-pink-900/40 rounded-xl p-2 text-white text-xs sm:text-sm">
+          <div className="text-lg font-semibold mb-2 text-black">Guna Milan Analysis</div>
+          <div className="min-w-[600px] grid grid-cols-6 gap-2 bg-gradient-to-r from-blue-900/60 to-pink-900/40 rounded-xl p-2 text-black text-xs sm:text-sm">
             <Tooltip title={GUNA_TOOLTIPS.kuta}><div className="font-bold">Kuta</div></Tooltip>
             <Tooltip title={GUNA_TOOLTIPS.bride_value}><div className="font-bold">Bride</div></Tooltip>
             <Tooltip title={GUNA_TOOLTIPS.groom_value}><div className="font-bold">Groom</div></Tooltip>
@@ -154,8 +154,8 @@ const MatchMakingResult: React.FC = () => {
         </div>
         {/* Compatibility Analysis */}
         <div className="w-full mb-6">
-          <div className="text-lg font-semibold mb-2 text-white/80">Compatibility Analysis</div>
-          <div className="bg-white/20 rounded-xl p-4 text-white/90 shadow-md text-base sm:text-lg">
+          <div className="text-lg font-semibold mb-2 text-black">Compatibility Analysis</div>
+          <div className="bg-white/20 rounded-xl p-4 text-gray-800 shadow-md text-base sm:text-lg">
             {result.compatibility_analysis}
           </div>
         </div>

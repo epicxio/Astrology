@@ -116,6 +116,10 @@ export const apiService = {
         const response = await fetch(`${BASE_URL}/matchmaking/`);
         if (!response.ok) throw new Error('Failed to fetch matchmaking records');
         return response.json();
+    },
+
+    deleteMatchMakingRecord: async (id: number): Promise<void> => {
+        await api.delete(`/matchmaking/${id}`);
     }
 };
 
