@@ -239,7 +239,7 @@ async def create_horoscope(horoscope: HoroscopeCreate, db: Session = Depends(get
 
 @router.get("/{horoscope_id}", response_model=HoroscopeResponse)
 async def get_horoscope(horoscope_id: int, db: Session = Depends(get_db)):
-    horoscope = db.query(Horoscope).filter(Horoscope.id == horoscope_id).first()
+    horoscope = db.query(Horoscope).filter(Horoscope.id == horoscope_id, Horoscope.deleted == False).first()
     if not horoscope:
         raise HTTPException(status_code=404, detail="Horoscope not found")
     
@@ -280,7 +280,7 @@ async def get_horoscope(horoscope_id: int, db: Session = Depends(get_db)):
 
 @router.get("/", response_model=List[HoroscopeResponse])
 async def list_horoscopes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    horoscopes = db.query(Horoscope).offset(skip).limit(limit).all()
+    horoscopes = db.query(Horoscope).filter(Horoscope.deleted == False).offset(skip).limit(limit).all()
     results = []
     for horoscope in horoscopes:
         place = db.query(Place).filter(Place.id == horoscope.place_id).first()
@@ -369,4 +369,13 @@ async def get_south_indian_chart(horoscope_id: int, db: Session = Depends(get_db
     # Only generate if it doesn't exist
     if not os.path.exists(filepath):
         plot_south_indian_chart(planetary_positions, filename=filepath, birth_details=birth_details)
-    return FileResponse(filepath, media_type="image/png", filename=filename) 
+    return FileResponse(filepath, media_type="image/png", filename=filename)
+
+@router.delete("/{horoscope_id}")
+def delete_horoscope(horoscope_id: int, db: Session = Depends(get_db)):
+    horoscope = db.query(Horoscope).filter(Horoscope.id == horoscope_id, Horoscope.deleted == False).first()
+    if not horoscope:
+        raise HTTPException(status_code=404, detail="Horoscope not found")
+    horoscope.deleted = True
+    db.commit()
+    return {"success": True} 

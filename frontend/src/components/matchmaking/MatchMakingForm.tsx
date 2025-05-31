@@ -150,17 +150,17 @@ const MatchMakingForm: React.FC = () => {
           </select>
         )}
         {steps[step].type === 'review' && (
-          <div className="w-full text-white/90 mb-4">
+          <div className="w-full text-black mb-4">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-2xl">{formData.groom_avatar}</span>
-              <span className="font-bold">{formData.groom_name}</span>
+              <span className="font-bold text-black">{formData.groom_name}</span>
             </div>
-            <div className="mb-2">DOB: {formData.groom_dob}, TOB: {formData.groom_tob}, Place: {places.find(p => p.id === formData.groom_place)?.name}</div>
+            <div className="mb-2 text-gray-800">DOB: {formData.groom_dob}, TOB: {formData.groom_tob}, Place: {places.find(p => p.id === formData.groom_place)?.name}</div>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-2xl">{formData.bride_avatar}</span>
-              <span className="font-bold">{formData.bride_name}</span>
+              <span className="font-bold text-black">{formData.bride_name}</span>
             </div>
-            <div>DOB: {formData.bride_dob}, TOB: {formData.bride_tob}, Place: {places.find(p => p.id === formData.bride_place)?.name}</div>
+            <div className="text-gray-800">DOB: {formData.bride_dob}, TOB: {formData.bride_tob}, Place: {places.find(p => p.id === formData.bride_place)?.name}</div>
           </div>
         )}
         {/* Stepper navigation */}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Image, Modal, Tooltip } from 'antd';
+import { Button, Image, Modal, Tooltip, message } from 'antd';
 import axios from 'axios';
-import { InfoCircleOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import PlanetaryStrengthCard from '../horoscope/PlanetaryStrengthCard';
 
 interface HoroscopeRecord {
@@ -67,6 +67,23 @@ const RecordsHoroscopePage: React.FC = () => {
     </div>
   );
 
+  const handleDelete = (id: number) => {
+    Modal.confirm({
+      title: 'Do you want to delete this record?',
+      okText: 'Yes',
+      cancelText: 'No',
+      onOk: async () => {
+        try {
+          await axios.delete(`/api/horoscope/${id}`);
+          setData(data => data.filter(r => r.id !== id));
+          message.success('Record deleted');
+        } catch (err) {
+          message.error('Failed to delete record');
+        }
+      },
+    });
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#f6f7fb] p-2 animate-fade-in">
       <div className="w-full max-w-5xl bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl p-4 sm:p-8 flex flex-col items-center">
@@ -116,6 +133,16 @@ const RecordsHoroscopePage: React.FC = () => {
                     />
                   </Tooltip>
                 )}
+                <Tooltip title="Delete Record">
+                  <Button
+                    shape="circle"
+                    icon={<DeleteOutlined />}
+                    size="small"
+                    danger
+                    className="ml-2"
+                    onClick={() => handleDelete(record.id)}
+                  />
+                </Tooltip>
               </div>
               <div className="flex flex-wrap gap-2 text-gray-700 text-sm">
                 <span className="bg-white rounded px-2 py-1">DOB: {record.date_of_birth}</span>
@@ -127,7 +154,7 @@ const RecordsHoroscopePage: React.FC = () => {
                 <span className="bg-white rounded px-2 py-1">Nakshatra: <span className="font-bold text-pink-500">{record.nakshatra}</span></span>
                 <span className="bg-white rounded px-2 py-1">Lagna: <span className="font-bold text-pink-500">{record.lagna}</span></span>
               </div>
-              <span className="text-xs text-gray-500 mt-1">Created: {new Date(record.created_at).toLocaleDateString()}</span>
+              <span className="text-xs text-gray-500 mt-1">Created: {new Date(record.created_at).toLocaleString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
             </div>
           ))}
         </div>

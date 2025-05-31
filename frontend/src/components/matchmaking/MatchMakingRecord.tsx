@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Button, message } from 'antd';
+import { Button, message, Modal, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { apiService } from '../../services/api';
 import { downloadPDF, getReportFilename } from '../../utils/pdfUtils';
+import { DeleteOutlined } from '@ant-design/icons';
 
 export interface MatchMakingRecord {
   id: number;
@@ -57,6 +58,23 @@ const MatchMakingRecord: React.FC = () => {
     }
   };
 
+  const handleDelete = (id: number) => {
+    Modal.confirm({
+      title: 'Do you want to delete this record?',
+      okText: 'Yes',
+      cancelText: 'No',
+      onOk: async () => {
+        try {
+          await apiService.deleteMatchMakingRecord(id);
+          setRecords(records => records.filter(r => r.id !== id));
+          message.success('Record deleted');
+        } catch (err) {
+          message.error('Failed to delete record');
+        }
+      },
+    });
+  };
+
   const toggleExpand = (id: number) => {
     setExpanded(expanded === id ? null : id);
   };
@@ -78,6 +96,16 @@ const MatchMakingRecord: React.FC = () => {
                 key={record.id}
                 className={`bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl p-6 flex flex-col gap-3 border border-pink-300/40 relative transition-all duration-200 ${isOpen ? 'ring-2 ring-pink-400 scale-105' : 'hover:scale-105'}`}
               >
+                <Tooltip title="Delete Record">
+                  <Button
+                    shape="circle"
+                    icon={<DeleteOutlined />}
+                    size="small"
+                    danger
+                    className="absolute top-3 right-3 z-10"
+                    onClick={() => handleDelete(record.id)}
+                  />
+                </Tooltip>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-3xl drop-shadow-lg">{record.bride_avatar || AVATARS[(idx*2+1)%AVATARS.length]}</span>
                   <span className="font-bold text-lg text-black tracking-tight">{record.bride_name}</span>

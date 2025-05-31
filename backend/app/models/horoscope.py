@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, Time, ForeignKey, DateTime, Text
+from sqlalchemy import Column, Integer, String, Date, Time, ForeignKey, DateTime, Text, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from .base import BaseModel
@@ -23,6 +23,7 @@ class Horoscope(BaseModel):
     planetary_strengths = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    deleted = Column(Boolean, default=False, nullable=False)
 
     # Relationships
     place = relationship("Place", back_populates="horoscopes")
