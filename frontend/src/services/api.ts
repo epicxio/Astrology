@@ -2,7 +2,8 @@ import axios from 'axios';
 import { MatchMakingRecord } from '../components/matchmaking/MatchMakingRecord';
 
 // Base URL for API requests
-const BASE_URL = 'http://localhost:5001/api';
+// const BASE_URL = 'http://localhost:5001/api';
+const BASE_URL = 'https://astrology-backend.fly.dev/api';
 
 // Create axios instance with base URL
 const api = axios.create({

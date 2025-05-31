@@ -24,7 +24,7 @@ const RecordsMatchmakingPage: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    axios.get('/api/matchmaking/')
+    axios.get('https://astrology-backend.fly.dev/api/matchmaking/')
       .then(res => setData(res.data))
       .finally(() => setLoading(false));
   }, []);

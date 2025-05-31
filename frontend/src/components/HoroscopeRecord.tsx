@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { RiDownloadLine, RiStarLine, RiBarChartLine } from 'react-icons/ri';
-import type { IconBaseProps } from 'react-icons';
 import { Horoscope } from '../types/horoscope';
 import { format } from 'date-fns';
 import PlanetaryStrengthCard from './horoscope/PlanetaryStrengthCard';

@@ -204,7 +204,7 @@ const HoroscopeOutput: React.FC<HoroscopeOutputProps> = ({ result }) => {
         <div style={{ marginTop: 32, textAlign: 'center' }}>
           <h3>South Indian Style Rasi Chart</h3>
           <img
-            src={`http://localhost:5001/api/horoscope/chart/south/${result.id}`}
+            src={`https://astrology-backend.fly.dev/api/horoscope/chart/south/${result.id}`}
             alt="South Indian Rasi Chart"
             style={{ maxWidth: 400, width: '100%', border: '2px solid #c9b89a', borderRadius: 8, background: '#fff8e1', margin: '0 auto' }}
           />

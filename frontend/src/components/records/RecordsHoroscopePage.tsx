@@ -29,7 +29,7 @@ const RecordsHoroscopePage: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    axios.get('/api/horoscope/')
+    axios.get('https://astrology-backend.fly.dev/api/horoscope/')
       .then(res => setData(res.data))
       .finally(() => setLoading(false));
   }, []);
