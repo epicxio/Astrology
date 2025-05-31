@@ -86,11 +86,7 @@ const RecordsHoroscopePage: React.FC = () => {
                 {record.chart_image ? (
                   <Image
                     width={40}
-                    src={(() => {
-                      const parts = record.chart_image?.split('/horoscope_charts/');
-                      const filename = parts.length > 1 ? parts[1] : '';
-                      return filename ? `/static/horoscope_charts/${filename}` : '';
-                    })()}
+                    src={`/api/horoscope/chart/south/${record.id}`}
                     alt="Chart"
                     className="rounded shadow"
                   />

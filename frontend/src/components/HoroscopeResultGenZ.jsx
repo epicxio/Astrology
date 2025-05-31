@@ -124,7 +124,7 @@ export default function HoroscopeResultGenZ({ result, avatar }) {
         <div className="w-full flex flex-col items-center mt-6 mb-2">
           <div className="text-lg font-semibold mb-2 text-black">South Indian Style Rasi Chart</div>
           <img
-            src={`http://localhost:5001/api/horoscope/chart/south/${result.id}`}
+            src={`/api/horoscope/chart/south/${result.id}`}
             alt="South Indian Rasi Chart"
             className="max-w-xs w-full border-2 border-pink-300 rounded-2xl bg-white/80 shadow-lg"
             style={{ background: '#fff8e1' }}
